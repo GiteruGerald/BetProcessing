@@ -1,6 +1,6 @@
 package com.betnare.controllers;
 
-import com.betnare.dto.GameResult;
+import com.betnare.entities.Bet;
 import com.betnare.services.BetsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 public record BetsController(BetsService betsService) {
 
     @PostMapping
-    public ResponseEntity<GameResult> processGameBets(@RequestBody GameResult result) {
-        log.info("Game result > {}", result);
-        betsService.processGameBets(result);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<Bet> createNewBet(@RequestBody Bet bet) {
+        Bet saved = betsService.placeBet(bet);
+        return ResponseEntity.ok(saved);
     }
 }

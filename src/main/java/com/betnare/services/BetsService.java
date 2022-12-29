@@ -1,22 +1,18 @@
 package com.betnare.services;
 
-import com.betnare.dto.BetProcessingRequest;
-import com.betnare.dto.GameResult;
-import com.betnare.enums.RabbitQueues;
-import com.betnare.repositories.GameRepository;
+import com.betnare.entities.Bet;
+import com.betnare.repositories.BetRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Slf4j
 @Service
-public record BetsService(GameRepository gameRepository, RabbitTemplate template) {
+public record BetsService(BetRepository betRepository) {
 
-    public void processGameBets(GameResult result) {
-        var matchBets = gameRepository.findAllByMatchId(result.getMatchId());
-
-        //Add all to the queue for processing
-        matchBets.forEach(game ->
-                template.convertAndSend(RabbitQueues.BET_PROCESSING_QUEUE.name(), new BetProcessingRequest(game.getGameId(), result)));
+    public Bet placeBet(Bet bet) {
+        Objects.requireNonNull(bet.getGameId(), "Game id is required to place a bet");
+        return betRepository.save(bet);
     }
 }
